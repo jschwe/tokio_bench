@@ -109,6 +109,8 @@ const fn normal_or_miri(normal: usize, miri: usize) -> usize {
     }
 }
 
+// todo: stolen increments by one here, so counting seems incorrect even before our queue
+// joins the picture
 #[test]
 fn stress1() {
     const NUM_ITER: usize = 5;

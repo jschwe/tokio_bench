@@ -595,7 +595,7 @@ impl Core {
             let target = &worker.handle.shared.remotes[i];
             if let Some(task) = target
                 .steal
-                .steal_into(&mut self.run_queue, &mut self.metrics)
+                .steal_into(&mut self.run_queue, &mut self.metrics, worker.inject())
             {
                 return Some(task);
             }

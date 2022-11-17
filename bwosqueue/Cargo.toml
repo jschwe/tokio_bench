@@ -1,0 +1,37 @@
+[package]
+name = "bwosqueue"
+version = "1.0.0"
+edition = "2018"
+
+[dependencies]
+# msrv currently 1.31 -> okay!
+cache-padded = "1.2.0"
+# MSRV # 1.51
+array-init = "2.1"
+
+
+[dev-dependencies]
+criterion = { version = "0.4.0", features = ["html_reports"] }
+core_affinity = "0.7.6"
+rand = "0.8.5"
+tracing = "0.1.37"
+
+
+[target.'cfg(loom)'.dependencies]
+loom = "0.5"
+
+[features]
+default = ["std"]
+std = []
+unstable = []
+stats = []
+
+
+[[bench]]
+name = "bench"
+harness = false
+
+[profile.bench]
+debug-assertions = false
+lto = true
+opt-level = 3
