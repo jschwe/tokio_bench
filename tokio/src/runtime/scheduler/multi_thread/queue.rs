@@ -110,6 +110,7 @@ impl<T> Steal<T> {
             } else {
                 dst_metrics.incr_steal_count(num_stolen.try_into().unwrap());
             }
+            dst_metrics.incr_steal_operations();
             first
         } else {
             None
