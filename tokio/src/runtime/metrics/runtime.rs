@@ -255,6 +255,14 @@ impl RuntimeMetrics {
             .load(Relaxed)
     }
 
+    pub fn worker_steal_operations(&self, worker: usize) -> u64 {
+        self.handle
+            .inner
+            .worker_metrics(worker)
+            .steal_operations
+            .load(Relaxed)
+    }
+
     /// Returns the number of tasks the given worker thread has polled.
     ///
     /// The worker poll count starts at zero when the runtime is created and
