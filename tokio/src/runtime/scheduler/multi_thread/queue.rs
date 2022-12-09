@@ -337,7 +337,7 @@ impl<T> Steal<T> {
         // from `dst` there may not be enough capacity to steal.
         let (steal, _) = unpack(dst.inner.head.load(Acquire));
 
-        if dst_tail.wrapping_sub(steal) > LOCAL_QUEUE_CAPACITY as UnsignedShort / 2 {
+        if dst_tail.wrapping_sub(steal) > ((LOCAL_QUEUE_CAPACITY * 7) / 8 ) as UnsignedShort {
             // we *could* try to steal less here, but for simplicity, we're just
             // going to abort.
             return None;
@@ -394,7 +394,7 @@ impl<T> Steal<T> {
 
             // Number of available tasks to steal
             let n = src_tail.wrapping_sub(src_head_real);
-            let n = n - n / 2;
+            let n = n - ( (n * 7) / 8);
 
             if n == 0 {
                 // No tasks available to steal
@@ -421,7 +421,7 @@ impl<T> Steal<T> {
         };
 
         assert!(
-            n <= LOCAL_QUEUE_CAPACITY as UnsignedShort / 2,
+            n <= LOCAL_QUEUE_CAPACITY as UnsignedShort / 8,
             "actual = {}",
             n
         );
