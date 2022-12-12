@@ -91,30 +91,10 @@ impl<T> Steal<T> {
         dst_metrics: &mut MetricsBatch,
         inject: &Inject<T>,
     ) -> Option<task::Notified<T>> {
-        // We know the queue is empty when we are here, so `steal_block` wont panic.
-        if let Some(mut stolen_tasks) = self.0.steal_block(){
-            let num_stolen = stolen_tasks.len();
-            let first = stolen_tasks.next();
-            debug_assert!(first.is_some());
-            // We know `dst` is empty, so we expect this to enqueue to succeed in most cases.
-            // In the rare case that the queue is at the same time also full, because the
-            // producer is blocked waiting on a stealer we inject into the inject queue.
-            // We could have also checked if `dst` has enough capacity before attempting to steal,
-            // but that check would have to be executed every time, while pushing into the inject
-            // queue is expected to be a very rare occurence.
-            if let Err(remaining_stolen_tasks) = dst.inner.enqueue_stolen_block(stolen_tasks) {
-                let remaining = remaining_stolen_tasks.len();
-                dst_metrics.incr_steal_count((num_stolen - remaining).try_into().unwrap());
-                inject.push_batch(remaining_stolen_tasks);
-                dst_metrics.incr_overflow_count();
-            } else {
-                dst_metrics.incr_steal_count(num_stolen.try_into().unwrap());
-            }
-            dst_metrics.incr_steal_operations();
-            first
-        } else {
-            None
-        }
+
+        // Steal nothing strategy (testing)
+        None
+
     }
 
 }
