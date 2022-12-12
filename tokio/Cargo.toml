@@ -98,6 +98,7 @@ autocfg = "1.1"
 
 [dependencies]
 tokio-macros = { version = "1.7.0", path = "../tokio-macros", optional = true }
+bwosqueue = { path = "../bwosqueue", features = ["stats"] }
 
 pin-project-lite = "0.2.0"
 
