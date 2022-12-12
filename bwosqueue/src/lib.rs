@@ -536,23 +536,31 @@ impl<E, const NUM_BLOCKS: usize, const ENTRIES_PER_BLOCK: usize>
                     return None;
                 }
 
+                // CAP stolen items for benchmark purposes.
+                const MAX_STEAL_TASKS: usize = 4;
+                let reserved_new = if reserved_idx + MAX_STEAL_TASKS < committed_idx {
+                    unsafe { reserved.index_add_unchecked(MAX_STEAL_TASKS) }
+                } else {
+                    committed
+                };
+
                 // Try to steal the block up to the latest committed entry
                 let reserve_res = blk
                     .reserved
-                    .compare_exchange_weak(reserved, committed, Release, Relaxed);
+                    .compare_exchange_weak(reserved, reserved_new, Release, Relaxed);
 
                 if reserve_res.is_err() {
                     return None;
                 }
 
-                let num_reserved = committed_idx - reserved_idx;
+                let num_reserved = reserved_new.raw_index() - reserved_idx;
                 // From the statistics perspective we consider the reserved range to already be
                 // stolen, since it is not available for the consumer or other stealers anymore.
                 #[cfg(feature = "stats")]
                 self.queue.stats.increment_stolen(num_reserved);
                 return Some(StealerBlockIter {
                     stealer_block: blk,
-                    block_reserved: committed_idx,
+                    block_reserved: reserved_new.raw_index(),
                     i: reserved_idx,
                     num_reserved,
                 });
